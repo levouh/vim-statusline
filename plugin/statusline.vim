@@ -28,7 +28,7 @@ let s:sl_current_mode={
                       \}
 
 " Set statusline based on window focus
-function! statusline#status()
+function! statusline#status() abort
     " Determine which window is focused
     let l:focused = s:statusline_winid == win_getid(winnr())
 
