@@ -43,7 +43,7 @@ function! statusline#status() abort
     let l:statusline.="\ %{''.(&fenc!=''?&fenc:&enc).''}"             " Encoding
     let l:statusline.="\ %{&ff}\ "                                    " FileFormat (dos/unix..)
     let l:statusline.=focused ? "%#Status4#" : "%#StatusLineNC#"      " Second color block
-    let l:statusline.="%{s_git_branch_name()}"                        " Git info
+    let l:statusline.="%{s:git_branch_name()}"                        " Git info
     let l:statusline.=focused ? "%#Status5#" : "%#StatusNone#"        " No color
     let l:statusline.="%="                                            " Right Side
     let l:statusline.=focused ? "%#Status4#" : "%#StatusLineNC#"      " Third color block
