@@ -1,17 +1,3 @@
-if exists('g:loaded_statusline')
-    finish
-endif
-
-let g:loaded_statusline = 1
-
-" Used for statusline colors based on focused window
-hi Status1              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=7      cterm=bold
-hi Status2              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=5      cterm=bold
-hi Status3              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=4      cterm=bold
-hi Status4              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=3      cterm=bold
-hi Status5              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=2      cterm=bold
-hi StatusNone           guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=1      cterm=bold
-
 " Set statusline based on window focus
 function! statusline#status() abort
     if !exists('g:_statusline_mode')
@@ -42,6 +28,21 @@ function! statusline#status() abort
     let l:statusline.="\ %n\ "                                        " Buffer number
 
     return l:statusline
+endfunction
+
+" Detect if a directory is part of a git directory.
+function! statusline#git_detect(path) abort
+    unlet! b:gitbranch_path
+    let b:gitbranch_pwd = expand("%:p:h")
+    let l:dir = s:git_branch_dir(a:path)
+
+    if l:dir !=# ""
+        let l:path = dir . "/HEAD"
+
+        if filereadable(l:path)
+            let b:gitbranch_path = l:path
+        endif
+    endif
 endfunction
 
 " Dictionary mapping of all different modes to the text that should be displayed.
@@ -117,29 +118,3 @@ function! s:git_branch_dir(path) abort
 
     return ""
 endfunction
-
-" Detect if a directory is part of a git directory.
-function! s:git_detect(path) abort
-    unlet! b:gitbranch_path
-    let b:gitbranch_pwd = expand("%:p:h")
-    let l:dir = s:git_branch_dir(a:path)
-
-    if l:dir !=# ""
-        let l:path = dir . "/HEAD"
-
-        if filereadable(l:path)
-            let b:gitbranch_path = l:path
-        endif
-    endif
-endfunction
-
-augroup statusline
-    au!
-
-    " Ensure the statusline gets drawn if 'lazyredraw' is enabled
-    au VimEnter * redraw
-
-    " Update git branch information based on certain events
-    au BufNewFile,BufReadPost * call s:git_detect(expand("<amatch>:p:h"))
-    au BufEnter * call s:git_detect(expand("%:p:h"))
-augroup END
