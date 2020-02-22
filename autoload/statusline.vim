@@ -18,7 +18,7 @@ function! statusline#status() abort
     let l:statusline.="\ %{''.(&fenc!=''?&fenc:&enc).''}"             " Encoding
     let l:statusline.="\ %{&ff}\ "                                    " FileFormat (dos/unix..)
     let l:statusline.=focused ? "%#Status4#" : "%#StatusLineNC#"      " Second color block
-    let l:statusline.="%{s:git_branch_name()}"                        " Git info
+    let l:statusline.="%{statusline#git_branch_name()}"               " Git info
     let l:statusline.=focused ? "%#Status5#" : "%#StatusNone#"        " No color
     let l:statusline.="%="                                            " Right Side
     let l:statusline.=focused ? "%#Status4#" : "%#StatusLineNC#"      " Third color block
@@ -30,9 +30,10 @@ function! statusline#status() abort
     return l:statusline
 endfunction
 
-" Detect if a directory is part of a git directory.
+" Detect if a directory is part of a git directory
 function! statusline#git_detect(path) abort
     unlet! b:gitbranch_path
+
     let b:gitbranch_pwd = expand("%:p:h")
     let l:dir = s:git_branch_dir(a:path)
 
@@ -45,7 +46,7 @@ function! statusline#git_detect(path) abort
     endif
 endfunction
 
-" Dictionary mapping of all different modes to the text that should be displayed.
+" Dictionary mapping of all different modes to the text that should be displayed
 function s:setup_mode_dict()
     let g:_statusline_mode={
                         \'n' : 'Normal',
@@ -71,9 +72,9 @@ function s:setup_mode_dict()
 endfunction
 
 " Get the name of the current git branch if it exists
-function! s:git_branch_name() abort
+function! statusline#git_branch_name() abort
     if get(b:, "gitbranch_pwd", "") !=# expand("%:p:h") || !has_key(b:, "gitbranch_path")
-        call s:git_detect(expand("%:p:h"))
+        call statusline#git_detect(expand("%:p:h"))
     endif
 
     if has_key(b:, "gitbranch_path") && filereadable(b:gitbranch_path)
