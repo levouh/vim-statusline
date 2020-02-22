@@ -4,6 +4,14 @@ endif
 
 let g:loaded_statusline = 1
 
+" Used for statusline colors based on focused window
+hi Status1              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=7      cterm=bold
+hi Status2              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=5      cterm=bold
+hi Status3              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=4      cterm=bold
+hi Status4              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=3      cterm=bold
+hi Status5              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=2      cterm=bold
+hi StatusNone           guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=1      cterm=bold
+
 " Set statusline based on window focus
 function! statusline#status() abort
     if !exists('g:_statusline_mode')
@@ -15,8 +23,8 @@ function! statusline#status() abort
 
     " Setup the statusline formatting
     let l:statusline=""
-    let l:statusline=focused ? "%#Status1#" : "%#StatusLineNC#"       " First color block, see dim.vim
-    let l:statusline.="\ %{toupper(s:sl_current_mode[mode()])}\ "     " The current mode
+    let l:statusline=focused ? "%#Status1#" : "%#StatusLineNC#"       " First color block
+    let l:statusline.="\ %{toupper(g:_statusline_mode[mode()])}\ "    " The current mode
     let l:statusline.=focused ? "%#Status2#" : "%#StatusLineNC#"      " Second color block
     let l:statusline.="\ %<%F%m%r%h%w\ "                              " File path, modified, readonly, helpfile, preview
     let l:statusline.=focused ? "%#Status3#" : "%#StatusLineNC#"      " Third color block
