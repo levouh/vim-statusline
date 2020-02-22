@@ -1,4 +1,4 @@
-if exists('g:_loaded_statusline') || v:version < 802
+if exists('g:_loaded_statusline') || v:version < 802 || has('gui_running')
     finish
 endif
 
