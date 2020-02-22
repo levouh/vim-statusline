@@ -85,8 +85,8 @@ function! s:git_branch_dir(path) abort
         let l:type = getftype(dir)
 
         if l:type ==# "dir" && isdirectory(l:dir . "/objects")
-                            \ && isdirectory(l:dir . "/refs")
-                            \ && getfsize(l:dir . "/HEAD") > 10
+                          \ && isdirectory(l:dir . "/refs")
+                          \ && getfsize(l:dir . "/HEAD") > 10
             return l:dir
         elseif l:type ==# "file"
             let l:reldir = get(readfile(l:dir), 0, "")
@@ -122,10 +122,10 @@ endfunction
 augroup statusline
     au!
 
-    " Ensure the statusline gets drawn if 'lazyredraw' is enabled.
+    " Ensure the statusline gets drawn if 'lazyredraw' is enabled
     au VimEnter * redraw
 
-    " Update Git branch information based on certain events.
-    au BufNewFile,BufReadPost * call GitDetect(expand("<amatch>:p:h"))
-    au BufEnter * call GitDetect(expand("%:p:h"))
+    " Update git branch information based on certain events
+    au BufNewFile,BufReadPost * call s:git_detect(expand("<amatch>:p:h"))
+    au BufEnter * call s:git_detect(expand("%:p:h"))
 augroup END
