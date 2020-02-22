@@ -4,31 +4,12 @@ endif
 
 let g:loaded_statusline = 1
 
-" Dictionary mapping of all different modes to the text that should be displayed.
-let s:sl_current_mode={
-                      \'n' : 'Normal',
-                      \'no' : 'Normal·Operator Pending',
-                      \'v' : 'Visual',
-                      \'V' : 'V·Line',
-                      \"\<C-v>" : 'V·Block',
-                      \'s' : 'Select',
-                      \'S' : 'S·Line',
-                      \"\<C-s>" : 'S·Block',
-                      \'i' : 'Insert',
-                      \'R' : 'Replace',
-                      \'Rv' : 'V·Replace',
-                      \'c' : 'Command',
-                      \'cv' : 'Vim Ex',
-                      \'ce' : 'Ex',
-                      \'r' : 'Prompt',
-                      \'rm' : 'More',
-                      \'r?' : 'Confirm',
-                      \'!' : 'Shell',
-                      \'t' : 'Terminal'
-                      \}
-
 " Set statusline based on window focus
 function! statusline#status() abort
+    if !exists('g:_statusline_mode')
+        call s:setup_mode_dict()
+    endif
+
     " Determine which window is focused
     let l:focused = g:statusline_winid == win_getid(winnr())
 
@@ -53,6 +34,31 @@ function! statusline#status() abort
     let l:statusline.="\ %n\ "                                        " Buffer number
 
     return l:statusline
+endfunction
+
+" Dictionary mapping of all different modes to the text that should be displayed.
+function s:setup_mode_dict()
+    let g:_statusline_mode={
+                        \'n' : 'Normal',
+                        \'no' : 'Normal·Operator Pending',
+                        \'v' : 'Visual',
+                        \'V' : 'V·Line',
+                        \"\<C-v>" : 'V·Block',
+                        \'s' : 'Select',
+                        \'S' : 'S·Line',
+                        \"\<C-s>" : 'S·Block',
+                        \'i' : 'Insert',
+                        \'R' : 'Replace',
+                        \'Rv' : 'V·Replace',
+                        \'c' : 'Command',
+                        \'cv' : 'Vim Ex',
+                        \'ce' : 'Ex',
+                        \'r' : 'Prompt',
+                        \'rm' : 'More',
+                        \'r?' : 'Confirm',
+                        \'!' : 'Shell',
+                        \'t' : 'Terminal'
+                        \}
 endfunction
 
 " Get the name of the current git branch if it exists
