@@ -5,6 +5,7 @@ _A simple statusline._
 ### Support
 
 _Vim_: 8.2.227
+_OS_: Linux
 
 ### Installation
 
