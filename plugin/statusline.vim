@@ -6,6 +6,7 @@ let g:_loaded_statusline = 1
 
 " Used for statusline colors based on focused window
 hi Status1              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=7      cterm=bold
+hi Status1Insert        guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=7      cterm=bold
 hi Status2              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=5      cterm=bold
 hi Status3              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=4      cterm=bold
 hi Status4              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=3      cterm=bold
