@@ -6,26 +6,32 @@ function! statusline#status() abort
 
     " Determine which window is focused
     let l:focused = g:statusline_winid == win_getid(winnr())
+    
+    if mode() == 'i'
+        let l:first_block = 'Status1Insert'
+    else
+        let l:first_block = 'Status1'
+    endif
 
     " Setup the statusline formatting
     let l:statusline=""
-    let l:statusline=focused ? "%#Status1#" : "%#StatusLineNC#"       " First color block
-    let l:statusline.="\ %{toupper(g:_statusline_mode[mode()])}\ "    " The current mode
-    let l:statusline.=focused ? "%#Status2#" : "%#StatusLineNC#"      " Second color block
-    let l:statusline.="\ %<%F%m%r%h%w\ "                              " File path, modified, readonly, helpfile, preview
-    let l:statusline.=focused ? "%#Status3#" : "%#StatusLineNC#"      " Third color block
-    let l:statusline.="\ %Y"                                          " Filetype
-    let l:statusline.="\ %{''.(&fenc!=''?&fenc:&enc).''}"             " Encoding
-    let l:statusline.="\ %{&ff}\ "                                    " FileFormat (dos/unix..)
-    let l:statusline.=focused ? "%#Status4#" : "%#StatusLineNC#"      " Second color block
-    let l:statusline.="%{statusline#git_branch_name()}"               " Git info
-    let l:statusline.=focused ? "%#Status5#" : "%#StatusNone#"        " No color
-    let l:statusline.="%="                                            " Right Side
-    let l:statusline.=focused ? "%#Status4#" : "%#StatusLineNC#"      " Third color block
-    let l:statusline.="\ col:\ %02v"                                  " Colomn number
-    let l:statusline.="\ ln:\ %02l/%L\ (%3p%%)\ "                     " Line number / total lines, percentage of document
-    let l:statusline.=focused ? "%#Status1#" : "%#StatusLineNC#"      " First color block, see dim
-    let l:statusline.="\ %n\ "                                        " Buffer number
+    let l:statusline=focused ? "%#" . l:first_block . "#" : "%#StatusLineNC#"  " First color block
+    let l:statusline.="\ %{toupper(g:_statusline_mode[mode()])}\ "             " The current mode
+    let l:statusline.=focused ? "%#Status2#" : "%#StatusLineNC#"               " Second color block
+    let l:statusline.="\ %<%F%m%r%h%w\ "                                       " File path, modified, readonly, helpfile, preview
+    let l:statusline.=focused ? "%#Status3#" : "%#StatusLineNC#"               " Third color block
+    let l:statusline.="\ %Y"                                                   " Filetype
+    let l:statusline.="\ %{''.(&fenc!=''?&fenc:&enc).''}"                      " Encoding
+    let l:statusline.="\ %{&ff}\ "                                             " FileFormat (dos/unix..)
+    let l:statusline.=focused ? "%#Status4#" : "%#StatusLineNC#"               " Second color block
+    let l:statusline.="%{statusline#git_branch_name()}"                        " Git info
+    let l:statusline.=focused ? "%#Status5#" : "%#StatusNone#"                 " No color
+    let l:statusline.="%="                                                     " Right Side
+    let l:statusline.=focused ? "%#Status4#" : "%#StatusLineNC#"               " Third color block
+    let l:statusline.="\ col:\ %02v"                                           " Colomn number
+    let l:statusline.="\ ln:\ %02l/%L\ (%3p%%)\ "                              " Line number / total lines, percentage of document
+    let l:statusline.=focused ? "%#Status1#" : "%#StatusLineNC#"               " First color block, see dim
+    let l:statusline.="\ %n\ "                                                 " Buffer number
 
     return l:statusline
 endfunction
