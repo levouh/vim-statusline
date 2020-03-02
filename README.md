@@ -4,25 +4,35 @@ _A simple statusline._
 
 ### Support
 
-_Vim_: 8.2.227
+_Vim_: 8.2.227  
 _OS_: Linux
 
 ### Installation
 
 ```
-Plug 'u0931220/vim-statusline'
+Plug 'levouh/vim-statusline'
 ```
 
 ### Setup
 
+Simply tell Vim what function you want to call to set your statusline:
+
 ```
-" Use mode information in the statusline, rather than have Vim display it
-set noshowmode
-
-" Show the statusline even when not split
-set laststatus=2
-
 set statusline=%!statusline#status()
+```
+
+### Recommended Settings
+
+Use mode information in the statusline, rather than have Vim display it:
+
+```
+set noshowmode
+```
+
+Show the statusline even when not split:
+
+```
+set laststatus=2
 ```
 
 ### Configuration
