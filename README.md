@@ -2,6 +2,10 @@
 
 _A simple statusline._
 
+### Note
+
+I have no idea what I am doing, so if you find a problem with this plugin please let me know.
+
 ### Support
 
 _I have only tested this plugin with the following:_  
