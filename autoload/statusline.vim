@@ -6,7 +6,7 @@ function! statusline#status() abort
 
     " Determine which window is focused
     let l:focused = g:statusline_winid == win_getid(winnr())
-    
+
     if mode() == 'i'
         let l:first_block = 'Status1Insert'
     else
