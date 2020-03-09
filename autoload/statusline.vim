@@ -1,14 +1,48 @@
+" --- Globals {{{
+
+    let s:palette = {}
+    let s:palette.blackest = [232, '#080808']
+    let s:palette.black = [234, '#1c1c1c']
+    let s:palette.gray01 = [235, '#262626']
+    let s:palette.gray02 = [238, '#444444']
+    let s:palette.gray03 = [239, '#4e4e4e']
+    let s:palette.gray04 = [240, '#585858']
+    let s:palette.gray05 = [242, '#666666']
+    let s:palette.gray06 = [243, '#767676']
+    let s:palette.gray07 = [244, '#808080']
+    let s:palette.gray08 = [245, '#8a8a8a']
+    let s:palette.gray09 = [246, '#949494']
+    let s:palette.gray10 = [247, '#9e9e9e']
+    let s:palette.gray11 = [248, '#a8a8a8']
+    let s:palette.gray12 = [249, '#b2b2b2']
+    let s:palette.gray13 = [250, '#bcbcbc']
+    let s:palette.gray14 = [251, '#c6c6c6']
+    let s:palette.gray15 = [254, '#e4e4e4']
+    let s:palette.white = [255, '#eeeeee']
+
+    let s:palette.comments = copy(s:palette.gray03)
+
+    let s:palette.purple = [62, '#5f5fd7']
+    let s:palette.brown = [94, '#875f00']
+    let s:palette.blue = [24, '#005f87']
+    let s:palette.lightblue = [31, '#00afff']
+    let s:palette.green = [29, '#00875f']
+    let s:palette.red = [88, '#870000']
+    let s:palette.magenta = [89, '#87005f']
+
+" }}}
+
 " --- Public Functions
 
     function! statusline#set_hi()
         " Used for statusline colors based on focused window
-        hi Status1              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=7      cterm=bold
-        hi Status1Insert        guifg=NONE      guibg=NONE       ctermfg=7     ctermbg=0      cterm=bold
-        hi Status2              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=5      cterm=bold
-        hi Status3              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=4      cterm=bold
-        hi Status4              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=3      cterm=bold
-        hi Status5              guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=2      cterm=bold
-        hi StatusNone           guifg=NONE      guibg=NONE       ctermfg=0     ctermbg=1      cterm=bold
+        call s:hi('Status1', s:palette.gray01, s:palette.gray15, 'bold')
+        call s:hi('Status2', s:palette.gray01, s:palette.gray11, 'bold')
+        call s:hi('Status3', s:palette.gray01, s:palette.gray09, 'bold')
+        call s:hi('Status4', s:palette.gray01, s:palette.gray07, 'bold')
+        call s:hi('Status5', s:palette.gray01, s:palette.gray05, 'bold')
+        call s:hi('StatusInsert', s:palette.gray15, s:palette.gray01, 'bold')
+        call s:hi('StatusNone', s:palette.gray05, s:palette.gray01, 'bold')
     endfunction
 
     " Set statusline based on window focus
@@ -21,29 +55,29 @@
         let l:focused = g:statusline_winid == win_getid(winnr())
 
         if mode() == 'i'
-            let l:first_block = 'Status1Insert'
+            let l:first_block = 'StatusInsert'
         else
             let l:first_block = 'Status1'
         endif
 
         " Setup the statusline formatting
         let l:statusline=""
-        let l:statusline=focused ? "%#" . l:first_block . "#" : "%#StatusLineNC#"  " First color block
+        let l:statusline=focused ? "%#" . l:first_block . "#" : "%#StatusNone#"    " First color block
         let l:statusline.="\ %{toupper(g:_statusline_mode[mode()])}\ "             " The current mode
-        let l:statusline.=focused ? "%#Status2#" : "%#StatusLineNC#"               " Second color block
+        let l:statusline.=focused ? "%#Status2#" : "%#StatusNone#"                 " Second color block
         let l:statusline.="\ %<%F%m%r%h%w\ "                                       " File path, modified, readonly, helpfile, preview
-        let l:statusline.=focused ? "%#Status3#" : "%#StatusLineNC#"               " Third color block
+        let l:statusline.=focused ? "%#Status3#" : "%#StatusNone#"                 " Third color block
         let l:statusline.="\ %Y"                                                   " Filetype
         let l:statusline.="\ %{''.(&fenc!=''?&fenc:&enc).''}"                      " Encoding
         let l:statusline.="\ %{&ff}\ "                                             " FileFormat (dos/unix..)
-        let l:statusline.=focused ? "%#Status4#" : "%#StatusLineNC#"               " Second color block
+        let l:statusline.=focused ? "%#Status4#" : "%#StatusNone#"                 " Second color block
         let l:statusline.="%{statusline#git_branch_name()}"                        " Git info
         let l:statusline.=focused ? "%#Status5#" : "%#StatusNone#"                 " No color
         let l:statusline.="%="                                                     " Right Side
-        let l:statusline.=focused ? "%#Status4#" : "%#StatusLineNC#"               " Third color block
+        let l:statusline.=focused ? "%#Status4#" : "%#StatusNone#"                 " Third color block
         let l:statusline.="\ col:\ %02v"                                           " Colomn number
         let l:statusline.="\ ln:\ %02l/%L\ (%3p%%)\ "                              " Line number / total lines, percentage of document
-        let l:statusline.=focused ? "%#Status1#" : "%#StatusLineNC#"               " First color block, see dim
+        let l:statusline.=focused ? "%#Status1#" : "%#StatusNone#"                 " First color block, see dim
         let l:statusline.="\ %n\ "                                                 " Buffer number
 
         return l:statusline
@@ -139,4 +173,24 @@
         endwhile
 
         return ""
+    endfunction
+
+    function! s:hi(group, fg_color, bg_color, style)
+        let highlight_command = ['hi', a:group]
+
+        if !empty(a:fg_color)
+            let [ctermfg, guifg] = a:fg_color
+            call add(highlight_command, printf('ctermfg=%d guifg=%s', ctermfg, guifg))
+        endif
+
+        if !empty(a:bg_color)
+            let [ctermbg, guibg] = a:bg_color
+            call add(highlight_command, printf('ctermbg=%d guibg=%s', ctermbg, guibg))
+        endif
+
+        if !empty(a:style)
+            call add(highlight_command, printf('cterm=%s gui=%s', a:style, a:style))
+        endif
+
+        execute join(highlight_command, ' ')
     endfunction
