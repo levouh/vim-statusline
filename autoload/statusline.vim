@@ -32,7 +32,7 @@
 
 " }}}
 
-" --- Public Functions
+" --- Public Functions {{{
 
     function! statusline#set_hi()
         " Used for statusline colors based on focused window
@@ -40,9 +40,9 @@
         call s:hi('Status2', s:palette.gray01, s:palette.gray11, 'bold')
         call s:hi('Status3', s:palette.gray01, s:palette.gray09, 'bold')
         call s:hi('Status4', s:palette.gray01, s:palette.gray07, 'bold')
-        call s:hi('Status5', s:palette.gray01, s:palette.gray05, 'bold')
+        call s:hi('Status5', s:palette.gray01, s:palette.gray01, 'bold')
         call s:hi('StatusInsert', s:palette.gray15, s:palette.gray01, 'bold')
-        call s:hi('StatusNone', s:palette.gray05, s:palette.gray01, 'bold')
+        call s:hi('StatusNone', s:palette.black, s:palette.gray01, 'bold')
     endfunction
 
     " Set statusline based on window focus
