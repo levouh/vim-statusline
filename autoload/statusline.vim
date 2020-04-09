@@ -42,7 +42,7 @@
         call s:hi('Status4', s:palette.gray01, s:palette.gray07, 'bold')
         call s:hi('Status5', s:palette.gray01, s:palette.gray01, 'bold')
         call s:hi('StatusInsert', s:palette.gray08, s:palette.gray01, 'bold')
-        call s:hi('StatusNone', s:palette.black, s:palette.gray01, 'bold')
+        call s:hi('StatusNone', s:palette.gray08, s:palette.gray01, 'bold')
     endfunction
 
     function! statusline#tab() abort
