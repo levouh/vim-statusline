@@ -68,11 +68,6 @@
         " After the last tab fill with TabLineFill and reset tab page nr
         let l:tabstr .= '%#TabLineFill#%T'
 
-        " Right-align the label to close the current tab page
-        if tabpagenr('$') > 1
-            let l:tabstr .= '%=%#TabLine#%999Xclose'
-        endif
-
         return l:tabstr
     endfunction
 
