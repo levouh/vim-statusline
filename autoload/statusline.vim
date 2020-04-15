@@ -62,7 +62,7 @@
             let l:tabstr .= '%' . l:tabidx . 'T'
 
             " Label should be tab working directory
-            let l:tabstr .= ' %{getcwd(0, ' . l:tabidx . ')} '
+            let l:tabstr .= ' %{getcwd(-1, ' . l:tabidx . ')} '
         endfor
 
         " After the last tab fill with TabLineFill and reset tab page nr
