@@ -78,7 +78,7 @@
         " Determine which window is focused
         let l:focused = g:statusline_winid == win_getid(winnr())
 
-        if mode() =! '[i|t]'
+        if mode() =~ '[i|t]'
             let l:first_block = 'StatusInsert'
         else
             let l:first_block = 'Status1'
