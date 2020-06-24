@@ -1,4 +1,4 @@
-" --- Verification
+" Verification {{{1
 
     if exists('g:_loaded_statusline') || v:version < 802
         finish
@@ -6,11 +6,11 @@
 
     let g:_loaded_statusline = 1
 
-" --- Setup
+" Setup {{{1
 
     call statusline#set_hi()
 
-" --- Autocommands
+" Autocommands {{{1
 
     augroup statusline
         au!

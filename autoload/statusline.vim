@@ -1,4 +1,4 @@
-" --- Globals {{{
+" Globals {{{1
 
     let s:palette = {}
     let s:palette.blackest = [232, '#080808']
@@ -30,11 +30,9 @@
     let s:palette.red = [88, '#870000']
     let s:palette.magenta = [89, '#87005f']
 
-" }}}
+" Public Functions {{{1
 
-" --- Public Functions {{{
-
-    function! statusline#set_hi()
+    fu! statusline#set_hi() " {{{2
         " Used for statusline colors based on focused window
         call s:hi('Status1', s:palette.gray01, s:palette.gray15, 'bold')
         call s:hi('Status2', s:palette.gray01, s:palette.gray11, 'bold')
@@ -43,9 +41,9 @@
         call s:hi('Status5', s:palette.gray01, s:palette.gray01, 'bold')
         call s:hi('StatusInsert', s:palette.gray08, s:palette.gray01, 'bold')
         call s:hi('StatusNone', s:palette.gray08, s:palette.gray01, 'bold')
-    endfunction
+    endfu
 
-    function! statusline#tab() abort
+    fu! statusline#tab() abort " {{{2
         let l:tabstr = ''
 
         for i in range(tabpagenr('$'))
@@ -69,10 +67,10 @@
         let l:tabstr .= '%#TabLineFill#%T'
 
         return l:tabstr
-    endfunction
+    endfu
 
     " Set statusline based on window focus
-    function! statusline#status() abort
+    fu! statusline#status() abort " {{{2
         if !exists('g:_statusline_mode')
             call s:setup_mode_dict()
         endif
@@ -80,7 +78,7 @@
         " Determine which window is focused
         let l:focused = g:statusline_winid == win_getid(winnr())
 
-        if mode() == 'i'
+        if mode() =! '[i|t]'
             let l:first_block = 'StatusInsert'
         else
             let l:first_block = 'Status1'
@@ -107,10 +105,10 @@
         let l:statusline.="\ %n\ "                                                 " Buffer number
 
         return l:statusline
-    endfunction
+    endfu
 
     " Detect if a directory is part of a git directory
-    function! statusline#git_detect(path) abort
+    fu! statusline#git_detect(path) abort " {{{2
         unlet! b:gitbranch_path
 
         let b:gitbranch_pwd = expand("%:p:h")
@@ -123,10 +121,10 @@
                 let b:gitbranch_path = l:path
             endif
         endif
-    endfunction
+    endfu
 
     " Dictionary mapping of all different modes to the text that should be displayed
-    function s:setup_mode_dict()
+    fu s:setup_mode_dict()
         let g:_statusline_mode={
                             \'n' : 'Normal',
                             \'no' : 'Normal·Operator Pending',
@@ -148,10 +146,10 @@
                             \'!' : 'Shell',
                             \'t' : 'Terminal'
                             \}
-    endfunction
+    endfu
 
     " Get the name of the current git branch if it exists
-    function! statusline#git_branch_name() abort
+    fu! statusline#git_branch_name() abort " {{{2
         if get(b:, "gitbranch_pwd", "") !=# expand("%:p:h") || !has_key(b:, "gitbranch_path")
             call statusline#git_detect(expand("%:p:h"))
         endif
@@ -168,12 +166,12 @@
         endif
 
         return ""
-    endfunction
+    endfu
 
-" --- Private Functions
+" Private Functions {{{1
 
     " Find git information based on the location of a buffer
-    function! s:git_branch_dir(path) abort
+    fu! s:git_branch_dir(path) abort " {{{2
         let l:path = a:path
         let l:prev = ""
 
@@ -199,9 +197,9 @@
         endwhile
 
         return ""
-    endfunction
+    endfu
 
-    function! s:hi(group, fg_color, bg_color, style)
+    fu! s:hi(group, fg_color, bg_color, style) " {{{2
         let highlight_command = ['hi', a:group]
 
         if !empty(a:fg_color)
@@ -219,4 +217,4 @@
         endif
 
         execute join(highlight_command, ' ')
-    endfunction
+    endfu
