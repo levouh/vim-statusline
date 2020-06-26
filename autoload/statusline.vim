@@ -43,68 +43,42 @@
         call s:hi('StatusNone', s:palette.gray08, s:palette.gray01, 'bold')
     endfu
 
-    fu! statusline#tab() abort " {{{2
-        let l:tabstr = ''
-
-        for i in range(tabpagenr('$'))
-            let l:tabidx = i + 1
-
-            " Select the highlighting
-            if l:tabidx == tabpagenr()
-                let l:tabstr .= '%#TabLineSel#'
-            else
-                let l:tabstr .= '%#TabLine#'
-            endif
-
-            " Set the tab page number (for mouse clicks)
-            let l:tabstr .= '%' . l:tabidx . 'T'
-
-            " Label should be tab working directory
-            let l:tabstr .= ' %{getcwd(-1, ' . l:tabidx . ')} '
-        endfor
-
-        " After the last tab fill with TabLineFill and reset tab page nr
-        let l:tabstr .= '%#TabLineFill#%T'
-
-        return l:tabstr
-    endfu
-
-    " Set statusline based on window focus
     fu! statusline#status() abort " {{{2
+        " Set statusline based on window focus
         if !exists('g:_statusline_mode')
             call s:setup_mode_dict()
         endif
 
         " Determine which window is focused
-        let l:focused = g:statusline_winid == win_getid(winnr())
+        let focused = g:statusline_winid == win_getid(winnr())
 
         if mode() =~ '[i|t]'
-            let l:first_block = 'StatusInsert'
+            let first_block = 'StatusInsert'
         else
-            let l:first_block = 'Status1'
+            let first_block = 'Status1'
         endif
 
         " Setup the statusline formatting
-        let l:statusline=""
-        let l:statusline=focused ? "%#" . l:first_block . "#" : "%#StatusNone#"    " First color block
-        let l:statusline.="\ %{toupper(g:_statusline_mode[mode()])}\ "             " The current mode
-        let l:statusline.=focused ? "%#Status2#" : "%#StatusNone#"                 " Second color block
-        let l:statusline.="\ %<%F%m%r%h%w\ "                                       " File path, modified, readonly, helpfile, preview
-        let l:statusline.=focused ? "%#Status3#" : "%#StatusNone#"                 " Third color block
-        let l:statusline.="\ %Y"                                                   " Filetype
-        let l:statusline.="\ %{''.(&fenc!=''?&fenc:&enc).''}"                      " Encoding
-        let l:statusline.="\ %{&ff}\ "                                             " FileFormat (dos/unix..)
-        let l:statusline.=focused ? "%#Status4#" : "%#StatusNone#"                 " Second color block
-        let l:statusline.="%{statusline#git_branch_name()}"                        " Git info
-        let l:statusline.=focused ? "%#Status5#" : "%#StatusNone#"                 " No color
-        let l:statusline.="%="                                                     " Right Side
-        let l:statusline.=focused ? "%#Status4#" : "%#StatusNone#"                 " Third color block
-        let l:statusline.="\ col:\ %02v"                                           " Colomn number
-        let l:statusline.="\ ln:\ %02l/%L\ (%3p%%)\ "                              " Line number / total lines, percentage of document
-        let l:statusline.=focused ? "%#Status1#" : "%#StatusNone#"                 " First color block, see dim
-        let l:statusline.="\ %n\ "                                                 " Buffer number
+        let statusline=""
+        let statusline=focused ? "%#" . first_block . "#" : "%#StatusNone#"      " First color block
+        let statusline.="\ %{toupper(g:_statusline_mode[mode()])}\ "             " The current mode
+        let statusline.=focused ? "%#Status2#" : "%#StatusNone#"                 " Second color block
+        let statusline.="\ %<%F%m%r%h%w\ "                                       " File path, modified, readonly, helpfile, preview
+        let statusline.=focused ? "%#Status3#" : "%#StatusNone#"                 " Third color block
+        let statusline.="\ %Y"                                                   " Filetype
+        let statusline.="\ %{''.(&fenc!=''?&fenc:&enc).''}"                      " Encoding
+        let statusline.="\ %{&ff}\ "                                             " FileFormat (dos/unix..)
+        let statusline.=focused ? "%#Status4#" : "%#StatusNone#"                 " Second color block
+        let statusline.="%{statusline#git_branch_name()}"                        " Git info
+        let statusline.=focused ? "%#Status5#" : "%#StatusNone#"                 " No color
+        let statusline.="%="                                                     " Right Side
+        let statusline.=focused ? "%#Status4#" : "%#StatusNone#"                 " Third color block
+        let statusline.="\ col:\ %02v"                                           " Colomn number
+        let statusline.="\ ln:\ %02l/%L\ (%3p%%)\ "                              " Line number / total lines, percentage of document
+        let statusline.=focused ? "%#Status1#" : "%#StatusNone#"                 " First color block, see dim
+        let statusline.="\ %n\ "                                                 " Buffer number
 
-        return l:statusline
+        return statusline
     endfu
 
     " Detect if a directory is part of a git directory
@@ -112,13 +86,13 @@
         unlet! b:gitbranch_path
 
         let b:gitbranch_pwd = expand("%:p:h")
-        let l:dir = s:git_branch_dir(a:path)
+        let dir = s:git_branch_dir(a:path)
 
-        if l:dir !=# ""
-            let l:path = dir . "/HEAD"
+        if dir !=# ""
+            let path = dir . "/HEAD"
 
-            if filereadable(l:path)
-                let b:gitbranch_path = l:path
+            if filereadable(path)
+                let b:gitbranch_path = path
             endif
         endif
     endfu
@@ -170,29 +144,29 @@
 
 " Private Functions {{{1
 
-    " Find git information based on the location of a buffer
     fu! s:git_branch_dir(path) abort " {{{2
-        let l:path = a:path
-        let l:prev = ""
+        " Find git information based on the location of a buffer
+        let path = a:path
+        let prev = ""
 
-        while l:path !=# prev
-            let l:dir = l:path . "/.git"
-            let l:type = getftype(dir)
+        while path !=# prev
+            let dir = path . "/.git"
+            let type = getftype(dir)
 
-            if l:type ==# "dir" && isdirectory(l:dir . "/objects")
-                            \ && isdirectory(l:dir . "/refs")
-                            \ && getfsize(l:dir . "/HEAD") > 10
-                return l:dir
-            elseif l:type ==# "file"
-                let l:reldir = get(readfile(l:dir), 0, "")
+            if type ==# "dir" && isdirectory(dir . "/objects")
+                            \ && isdirectory(dir . "/refs")
+                            \ && getfsize(dir . "/HEAD") > 10
+                return dir
+            elseif type ==# "file"
+                let reldir = get(readfile(dir), 0, "")
 
-                if l:reldir =~# "^gitdir: "
-                    return simplify(l:path . "/" . l:reldir[8:])
+                if reldir =~# "^gitdir: "
+                    return simplify(path . "/" . reldir[8:])
                 endif
             endif
 
-            let l:prev = l:path
-            let l:path = fnamemodify(l:path, ":h")
+            let prev = path
+            let path = fnamemodify(path, ":h")
 
         endwhile
 
