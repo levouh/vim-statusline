@@ -1,8 +1,9 @@
-" Globals {{{1
+" Palette {{{1
 
     let s:palette = {}
 
     let s:palette.black        = [235, '#1C1C1C']
+    let s:palette.none         = ['NONE', 'NONE']
 
     let s:palette.color00      = [235, '#555555']
     let s:palette.color01      = [235, '#696969']
@@ -13,166 +14,224 @@
     let s:palette.color06      = [243, '#D8D8D8']
     let s:palette.color07      = [244, '#F0F0F0']
 
-" Public Functions {{{1
+fu! statusline#set_hi() " {{{1
+    " Used for statusline colors based on focused window
+    "
+    " Different blocks within the statusline itself
+    call s:hi('Status1', s:palette.black, s:palette.color07, 'bold')
+    call s:hi('Status2', s:palette.black, s:palette.color05, 'bold')
+    call s:hi('Status3', s:palette.black, s:palette.color03, 'bold')
+    call s:hi('Status4', s:palette.black, s:palette.color01, 'bold')
 
-    fu! statusline#set_hi() " {{{2
-        " Used for statusline colors based on focused window
-        call s:hi('Status1', s:palette.black, s:palette.color07, 'bold')
-        call s:hi('Status2', s:palette.black, s:palette.color05, 'bold')
-        call s:hi('Status3', s:palette.black, s:palette.color03, 'bold')
-        call s:hi('Status4', s:palette.black, s:palette.color01, 'bold')
-        call s:hi('Status5', s:palette.black, s:palette.color00, 'bold')
+    " Highlight text in a different color
+    call s:hi('StatusText', s:palette.color05, s:palette.color01, 'bold')
 
-        call s:hi('StatusInsert', s:palette.color07, s:palette.black, 'bold')
-        call s:hi('StatusNone', s:palette.color07, s:palette.black, 'bold')
-    endfu
+    " The block separator between blocks on different sides
+    call s:hi('StatusSep', s:palette.black, s:palette.black, 'bold')
 
-    fu! statusline#status() abort " {{{2
-        " Set statusline based on window focus
-        if !exists('g:_statusline_mode')
-            call s:setup_mode_dict()
-        endif
+    " The default to use for all statusline parts when not focused
+    call s:hi('StatusNone', s:palette.color02, s:palette.black, 'bold')
+endfu
 
-        " Determine which window is focused
-        let focused = g:statusline_winid == win_getid(winnr())
+fu! statusline#status() abort " {{{1
+    " Set statusline based on window focus
+    if !exists('g:_statusline_mode')
+        call s:setup_mode_dict()
+    endif
 
-        if mode() =~ '[i|t]'
-            let first_block = 'StatusInsert'
-        else
-            let first_block = 'Status1'
-        endif
+    " Determine which window is focused
+    let focused = g:statusline_winid == win_getid(winnr())
 
-        " Setup the statusline formatting
-        let statusline=""
-        let statusline=focused ? "%#" . first_block . "#" : "%#StatusNone#"      " First color block
-        let statusline.="\ %{toupper(g:_statusline_mode[mode()])}\ "             " The current mode
-        let statusline.=focused ? "%#Status2#" : "%#StatusNone#"                 " Second color block
-        let statusline.="\ %<%F%m%r%h%w\ "                                       " File path, modified, readonly, helpfile, preview
-        let statusline.=focused ? "%#Status3#" : "%#StatusNone#"                 " Third color block
-        let statusline.="\ %Y"                                                   " Filetype
-        let statusline.="\ %{''.(&fenc!=''?&fenc:&enc).''}"                      " Encoding
-        let statusline.="\ %{&ff}\ "                                             " FileFormat (dos/unix..)
-        let statusline.=focused ? "%#Status4#" : "%#StatusNone#"                 " Second color block
-        let statusline.="%{statusline#git_branch_name()}"                        " Git info
-        let statusline.=focused ? "%#Status5#" : "%#StatusNone#"                 " No color
-        let statusline.="%="                                                     " Right Side
-        let statusline.=focused ? "%#Status4#" : "%#StatusNone#"                 " Third color block
-        let statusline.="\ col:\ %02v"                                           " Colomn number
-        let statusline.="\ ln:\ %02l/%L\ (%3p%%)\ "                              " Line number / total lines, percentage of document
-        let statusline.=focused ? "%#Status1#" : "%#StatusNone#"                 " First color block, see dim
-        let statusline.="\ %n\ "                                                 " Buffer number
+    if focused
+        return s:focused_statusline()
+    else
+        return s:unfocused_statusline()
+    endif
+endfu
 
-        return statusline
-    endfu
-
+fu! statusline#git_detect(path) abort " {{{1
     " Detect if a directory is part of a git directory
-    fu! statusline#git_detect(path) abort " {{{2
-        unlet! b:gitbranch_path
+    unlet! b:gitbranch_path
 
-        let b:gitbranch_pwd = expand("%:p:h")
-        let dir = s:git_branch_dir(a:path)
+    let b:gitbranch_pwd = expand("%:p:h")
+    let dir = s:git_branch_dir(a:path)
 
-        if dir !=# ""
-            let path = dir . "/HEAD"
+    if dir !=# ""
+        let path = dir . "/HEAD"
 
-            if filereadable(path)
-                let b:gitbranch_path = path
-            endif
+        if filereadable(path)
+            let b:gitbranch_path = path
         endif
-    endfu
+    endif
+endfu
 
-    " Dictionary mapping of all different modes to the text that should be displayed
-    fu s:setup_mode_dict()
-        let g:_statusline_mode={
-                            \'n' : 'Normal',
-                            \'no' : 'Normal·Operator Pending',
-                            \'v' : 'Visual',
-                            \'V' : 'V·Line',
-                            \"\<C-v>" : 'V·Block',
-                            \'s' : 'Select',
-                            \'S' : 'S·Line',
-                            \"\<C-s>" : 'S·Block',
-                            \'i' : 'Insert',
-                            \'R' : 'Replace',
-                            \'Rv' : 'V·Replace',
-                            \'c' : 'Command',
-                            \'cv' : 'Vim Ex',
-                            \'ce' : 'Ex',
-                            \'r' : 'Prompt',
-                            \'rm' : 'More',
-                            \'r?' : 'Confirm',
-                            \'!' : 'Shell',
-                            \'t' : 'Terminal'
-                            \}
-    endfu
-
+fu! statusline#git_branch_name() abort " {{{1
     " Get the name of the current git branch if it exists
-    fu! statusline#git_branch_name() abort " {{{2
-        if get(b:, "gitbranch_pwd", "") !=# expand("%:p:h") || !has_key(b:, "gitbranch_path")
-            call statusline#git_detect(expand("%:p:h"))
+    if get(b:, "gitbranch_pwd", "") !=# expand("%:p:h") || !has_key(b:, "gitbranch_path")
+        call statusline#git_detect(expand("%:p:h"))
+    endif
+
+    if has_key(b:, "gitbranch_path") && filereadable(b:gitbranch_path)
+        let branch = get(readfile(b:gitbranch_path), 0, "")
+
+        if branch =~# "^ref: "
+            return " " . substitute(branch, '^ref: \%(refs/\%(heads/\|remotes/\|tags/\)\=\)\=', "", "") . " "
+        elseif branch =~# '^\x\{20\}'
+            return " " . branch[:6] . " "
         endif
 
-        if has_key(b:, "gitbranch_path") && filereadable(b:gitbranch_path)
-            let branch = get(readfile(b:gitbranch_path), 0, "")
+    endif
 
-            if branch =~# "^ref: "
-                return " " . substitute(branch, '^ref: \%(refs/\%(heads/\|remotes/\|tags/\)\=\)\=', "", "") . " "
-            elseif branch =~# '^\x\{20\}'
-                return " " . branch[:6] . " "
+    return ""
+endfu
+
+fu! statusline#filepath() abort " {{{1
+    let filepath = ""
+    let bufpath = expand("%:f")
+
+    if empty(bufpath)
+        let bufpath = '[No Name]'
+    endif
+
+    if &buftype != "terminal"
+        let filepath .= fnamemodify(bufpath, ':.')
+        let filepath .= &modified ? '*' : ''
+        let filepath .= &ro ? ' RO ' : ' '
+    else
+        let filepath .= bufpath
+        let filepath .= ' '
+    endif
+
+    return filepath
+endfu
+
+fu! s:setup_mode_dict() " {{{1
+    " Dictionary mapping of all different modes to the text that should be displayed
+    let g:_statusline_mode={
+        \'n' : 'Normal',
+        \'no' : 'Normal·Operator Pending',
+        \'v' : 'Visual',
+        \'V' : 'V·Line',
+        \"\<C-v>" : 'V·Block',
+        \'s' : 'Select',
+        \'S' : 'S·Line',
+        \"\<C-s>" : 'S·Block',
+        \'i' : 'Insert',
+        \'R' : 'Replace',
+        \'Rv' : 'V·Replace',
+        \'c' : 'Command',
+        \'cv' : 'Vim Ex',
+        \'ce' : 'Ex',
+        \'r' : 'Prompt',
+        \'rm' : 'More',
+        \'r?' : 'Confirm',
+        \'!' : 'Shell',
+        \'t' : 'Terminal'
+    \}
+endfu
+
+fu! s:git_branch_dir(path) abort " {{{1
+    " Find git information based on the location of a buffer
+    let path = a:path
+    let prev = ""
+
+    while path !=# prev
+        let dir = path . "/.git"
+        let type = getftype(dir)
+
+        if type ==# "dir" && isdirectory(dir . "/objects")
+                        \ && isdirectory(dir . "/refs")
+                        \ && getfsize(dir . "/HEAD") > 10
+            return dir
+        elseif type ==# "file"
+            let reldir = get(readfile(dir), 0, "")
+
+            if reldir =~# "^gitdir: "
+                return simplify(path . "/" . reldir[8:])
             endif
-
         endif
 
-        return ""
-    endfu
+        let prev = path
+        let path = fnamemodify(path, ":h")
 
-" Private Functions {{{1
+    endwhile
 
-    fu! s:git_branch_dir(path) abort " {{{2
-        " Find git information based on the location of a buffer
-        let path = a:path
-        let prev = ""
+    return ""
+endfu
 
-        while path !=# prev
-            let dir = path . "/.git"
-            let type = getftype(dir)
+fu! s:hi(group, fg_color, bg_color, style) " {{{1
+    " Function called to setup a particular highlight group
+    let highlight_command = ['hi!', a:group]
+    "                                 │
+    "                                 └ the name of the group
 
-            if type ==# "dir" && isdirectory(dir . "/objects")
-                            \ && isdirectory(dir . "/refs")
-                            \ && getfsize(dir . "/HEAD") > 10
-                return dir
-            elseif type ==# "file"
-                let reldir = get(readfile(dir), 0, "")
+    if !empty(a:fg_color)
+        let [ctermfg, guifg] = a:fg_color
+        let cterm_format = type(ctermfg) is# v:t_string ? '%s' : '%d'
+        let printf_str = 'ctermfg=' .. cterm_format .. ' guifg=%s'
 
-                if reldir =~# "^gitdir: "
-                    return simplify(path . "/" . reldir[8:])
-                endif
-            endif
+        call add(highlight_command, printf(printf_str, ctermfg, guifg))
+    endif
 
-            let prev = path
-            let path = fnamemodify(path, ":h")
+    if !empty(a:bg_color)
+        let [ctermbg, guibg] = a:bg_color
+        let cterm_format = type(ctermbg) is# v:t_string ? '%s' : '%d'
+        let printf_str = 'ctermbg=' .. cterm_format .. ' guibg=%s'
 
-        endwhile
+        call add(highlight_command, printf(printf_str, ctermbg, guibg))
+    endif
 
-        return ""
-    endfu
+    let style = empty(a:style) ? 'NONE' : a:style
 
-    fu! s:hi(group, fg_color, bg_color, style) " {{{2
-        let highlight_command = ['hi', a:group]
+    call add(highlight_command, printf('cterm=%s gui=%s', style, style))
 
-        if !empty(a:fg_color)
-            let [ctermfg, guifg] = a:fg_color
-            call add(highlight_command, printf('ctermfg=%d guifg=%s', ctermfg, guifg))
-        endif
+    exe join(highlight_command, ' ')
+endfu
 
-        if !empty(a:bg_color)
-            let [ctermbg, guibg] = a:bg_color
-            call add(highlight_command, printf('ctermbg=%d guibg=%s', ctermbg, guibg))
-        endif
+fu! s:focused_statusline() " {{{1
+    " Setup the statusline formatting for any unfocused window
+    let statusline=""
 
-        if !empty(a:style)
-            call add(highlight_command, printf('cterm=%s gui=%s', a:style, a:style))
-        endif
+    let statusline="%#Status1#"                                        " First color block
+    let statusline.="\ %{toupper(g:_statusline_mode[mode()])}\ "       " The current mode
+    let statusline.="%#Status2#"                                       " Second color block
+    let statusline.="\ %<%{statusline#filepath()}"                     " File path, modified, readonly
+    let statusline.="%#Status3#"                                       " Third color block
+    let statusline.="%(\ %Y%)"                                         " Filetype
+    let statusline.="\ %{'' .. (&fenc != '' ? &fenc : &enc) .. ''}"    " Encoding
+    let statusline.="\ %{&ff}\ "                                       " File format (DOS/UNIX)
+    let statusline.="%#Status4#"                                       " Fourth color block
+    let statusline.="%<%{statusline#git_branch_name()}"                " Git info
+    let statusline.="%#StatusSep#"                                     " No color
+    let statusline.="%="                                               " Right Side
+    let statusline.="%#StatusText#"                                    " Text for line/column section
+    let statusline.="\ col:"                                           " Colomn text
+    let statusline.="%#Status4#"                                       " Third color block
+    let statusline.="\ %02v"                                           " Column number
+    let statusline.="%#StatusText#"                                    " Text for line/column section
+    let statusline.="\ ln:"                                            " Line text
+    let statusline.="%#Status4#"                                       " Third color block
+    let statusline.="\ %02l/%L\ (%3p%%)\ "                             " Line number / total lines, percentage of document
+    let statusline.="%#Status1#"                                       " Fifth color block, see dim
+    let statusline.="\ %n\ "                                           " Buffer number
 
-        execute join(highlight_command, ' ')
-    endfu
+    return statusline
+endfu
+
+fu! s:unfocused_statusline() " {{{1
+    " Setup the statusline formatting for any unfocused window
+    let statusline=""
+
+    let statusline="%#StatusNone#"                                     " Highlight for all unfocused blocks
+    let statusline.="\ %<%{statusline#filepath()}"                     " File path, modified, readonly
+    let statusline.="%(\ %Y%)"                                         " Filetype
+    let statusline.="\ %{'' .. (&fenc != '' ? &fenc : &enc) .. ''}"    " Encoding
+    let statusline.="\ %{&ff}\ "                                       " File format (DOS/UNIX)
+    let statusline.="%<%{statusline#git_branch_name()}"                " Git info
+    let statusline.="%="                                               " Right Side
+    let statusline.="\ col:\ %02v"                                     " Colomn number
+    let statusline.="\ ln:\ %02l/%L\ (%3p%%)\ "                        " Line number / total lines, percentage of document
+    let statusline.="\ %n\ "                                           " Buffer number
+
+    return statusline
+endfu
