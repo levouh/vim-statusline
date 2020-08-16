@@ -1,46 +1,30 @@
 " Globals {{{1
 
     let s:palette = {}
-    let s:palette.blackest = [232, '#080808']
-    let s:palette.black = [234, '#1c1c1c']
-    let s:palette.gray01 = [235, '#262626']
-    let s:palette.gray02 = [238, '#444444']
-    let s:palette.gray03 = [239, '#4e4e4e']
-    let s:palette.gray04 = [240, '#585858']
-    let s:palette.gray05 = [242, '#666666']
-    let s:palette.gray06 = [243, '#767676']
-    let s:palette.gray07 = [244, '#808080']
-    let s:palette.gray08 = [245, '#8a8a8a']
-    let s:palette.gray09 = [246, '#949494']
-    let s:palette.gray10 = [247, '#9e9e9e']
-    let s:palette.gray11 = [248, '#a8a8a8']
-    let s:palette.gray12 = [249, '#b2b2b2']
-    let s:palette.gray13 = [250, '#bcbcbc']
-    let s:palette.gray14 = [251, '#c6c6c6']
-    let s:palette.gray15 = [254, '#e4e4e4']
-    let s:palette.white = [255, '#eeeeee']
 
-    let s:palette.comments = copy(s:palette.gray03)
+    let s:palette.black        = [235, '#1C1C1C']
 
-    let s:palette.purple = [62, '#5f5fd7']
-    let s:palette.brown = [94, '#875f00']
-    let s:palette.blue = [24, '#005f87']
-    let s:palette.lightblue = [31, '#00afff']
-    let s:palette.green = [29, '#00875f']
-    let s:palette.red = [88, '#870000']
-    let s:palette.magenta = [89, '#87005f']
+    let s:palette.color00      = [235, '#555555']
+    let s:palette.color01      = [235, '#696969']
+    let s:palette.color02      = [238, '#7E7E7E']
+    let s:palette.color03      = [239, '#949494']
+    let s:palette.color04      = [240, '#AAAAAA']
+    let s:palette.color05      = [242, '#C1C1C1']
+    let s:palette.color06      = [243, '#D8D8D8']
+    let s:palette.color07      = [244, '#F0F0F0']
 
 " Public Functions {{{1
 
     fu! statusline#set_hi() " {{{2
         " Used for statusline colors based on focused window
-        call s:hi('Status1', s:palette.gray01, s:palette.gray15, 'bold')
-        call s:hi('Status2', s:palette.gray01, s:palette.gray11, 'bold')
-        call s:hi('Status3', s:palette.gray01, s:palette.gray09, 'bold')
-        call s:hi('Status4', s:palette.gray01, s:palette.gray07, 'bold')
-        call s:hi('Status5', s:palette.gray01, s:palette.gray01, 'bold')
-        call s:hi('StatusInsert', s:palette.gray08, s:palette.gray01, 'bold')
-        call s:hi('StatusNone', s:palette.gray08, s:palette.gray01, 'bold')
+        call s:hi('Status1', s:palette.black, s:palette.color07, 'bold')
+        call s:hi('Status2', s:palette.black, s:palette.color05, 'bold')
+        call s:hi('Status3', s:palette.black, s:palette.color03, 'bold')
+        call s:hi('Status4', s:palette.black, s:palette.color01, 'bold')
+        call s:hi('Status5', s:palette.black, s:palette.color00, 'bold')
+
+        call s:hi('StatusInsert', s:palette.color07, s:palette.black, 'bold')
+        call s:hi('StatusNone', s:palette.color07, s:palette.black, 'bold')
     endfu
 
     fu! statusline#status() abort " {{{2
